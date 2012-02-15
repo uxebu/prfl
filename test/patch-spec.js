@@ -38,13 +38,21 @@ suite('patch functionality', function() {
     expect(method.calledOn(object)).to.be.ok();
   });
 
+  test('A patched method receives the arguments passed to the wrapper', function() {
+    var method = sinon.spy();
+    var object = {method: method};
+    patch(object, 'method');
+
+    object.method(1, 'foo', object);
+    expect(method.calledWith(1, 'foo', object)).to.be.ok();
+  });
 });
 
 
 function patch(object, name) {
   var patched = object[name];
   object[name] = function() {
-    return patched.call(this);
+    return patched.apply(this, arguments);
   };
 }
 
