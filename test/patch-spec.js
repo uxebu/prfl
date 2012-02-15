@@ -57,3 +57,25 @@ suite('Method wrapping functionality', function() {
 function wrapMethod(object, methodName) {
   object[methodName] = wrapFunction(object[methodName]);
 }
+
+suite('Object wrapping functionality', function() {
+  test('All methods of an object are wrapped', function() {
+    function foo() {}
+    function bar() {}
+    function baz() {}
+    var object = {foo: foo, bar: bar, baz: baz};
+
+    wrapObject(object);
+
+    expect(object.foo).not.to.be(foo);
+    expect(object.bar).not.to.be(bar);
+    expect(object.baz).not.to.be(baz);
+  })
+});
+
+function wrapObject(object) {
+  var names = Object.keys(object);
+  for (var i = 0, len = names.length, name; (name = names[i]) || i < len; i++) {
+    wrapMethod(object, name);
+  }
+}
