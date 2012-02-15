@@ -1,6 +1,40 @@
 var expect = require('expect.js');
 var sinon = require('sinon');
 
+suite('wrapping functionality', function() {
+  test('The return value of a wrapped function is passed through', function() {
+    var func = wrap(function() {
+      return 1;
+    });
+
+    expect(func()).to.be(1);
+  });
+
+  test('A wrapped function is invoked in the correct context', function() {
+    var spy = sinon.spy();
+    var func = wrap(spy);
+    var context = {};
+
+    func.call(context);
+    expect(spy.calledOn(context)).to.be.ok();
+  });
+
+  test('A wrapped function receives the arguments passed to the wrapper', function() {
+    var spy = sinon.spy();
+    var func = wrap(spy);
+    var object = {};
+
+    func(1, 'foo', object);
+    expect(spy.calledWith(1, 'foo', object)).to.be.ok();
+  });
+});
+
+function wrap(func) {
+  return function() {
+    return func.apply(this, arguments);
+  };
+}
+
 suite('patch functionality', function() {
   test('A patched method is overwritten', function() {
     var method = function() {};
@@ -18,41 +52,8 @@ suite('patch functionality', function() {
 
     expect(method.called).to.be.ok();
   });
-
-  test('The return value of a patched method is passed through', function() {
-    var method = function() {
-      return 1;
-    };
-    var object = {method: method};
-    patch(object, 'method');
-
-    expect(object.method()).to.be(1);
-  });
-
-  test('A patched method is invoked in the correct context', function() {
-    var method = sinon.spy();
-    var object = {method: method};
-    patch(object, 'method');
-    object.method();
-
-    expect(method.calledOn(object)).to.be.ok();
-  });
-
-  test('A patched method receives the arguments passed to the wrapper', function() {
-    var method = sinon.spy();
-    var object = {method: method};
-    patch(object, 'method');
-
-    object.method(1, 'foo', object);
-    expect(method.calledWith(1, 'foo', object)).to.be.ok();
-  });
 });
 
-
-function patch(object, name) {
-  var patched = object[name];
-  object[name] = function() {
-    return patched.apply(this, arguments);
-  };
+function patch(object, methodName) {
+  object[methodName] = wrap(object[methodName]);
 }
-
