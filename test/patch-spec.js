@@ -1,9 +1,9 @@
 var expect = require('expect.js');
 var sinon = require('sinon');
 
-suite('wrapping functionality', function() {
+suite('Function wrapping functionality', function() {
   test('The return value of a wrapped function is passed through', function() {
-    var func = wrap(function() {
+    var func = wrapFunction(function() {
       return 1;
     });
 
@@ -12,7 +12,7 @@ suite('wrapping functionality', function() {
 
   test('A wrapped function is invoked in the correct context', function() {
     var spy = sinon.spy();
-    var func = wrap(spy);
+    var func = wrapFunction(spy);
     var context = {};
 
     func.call(context);
@@ -21,7 +21,7 @@ suite('wrapping functionality', function() {
 
   test('A wrapped function receives the arguments passed to the wrapper', function() {
     var spy = sinon.spy();
-    var func = wrap(spy);
+    var func = wrapFunction(spy);
     var object = {};
 
     func(1, 'foo', object);
@@ -29,17 +29,17 @@ suite('wrapping functionality', function() {
   });
 });
 
-function wrap(func) {
+function wrapFunction(func) {
   return function() {
     return func.apply(this, arguments);
   };
 }
 
-suite('patch functionality', function() {
+suite('Method wrapping functionality', function() {
   test('A patched method is overwritten', function() {
     var method = function() {};
     var object = {method: method};
-    patch(object, 'method');
+    wrapMethod(object, 'method');
 
     expect(object.method).not.to.be(method);
   });
@@ -47,13 +47,13 @@ suite('patch functionality', function() {
   test('A patched method is still invoked', function() {
     var method = sinon.spy();
     var object = {method: method};
-    patch(object, 'method');
+    wrapMethod(object, 'method');
     object.method();
 
     expect(method.called).to.be.ok();
   });
 });
 
-function patch(object, methodName) {
-  object[methodName] = wrap(object[methodName]);
+function wrapMethod(object, methodName) {
+  object[methodName] = wrapFunction(object[methodName]);
 }
