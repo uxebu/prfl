@@ -70,12 +70,56 @@ suite('Object wrapping functionality', function() {
     expect(object.foo).not.to.be(foo);
     expect(object.bar).not.to.be(bar);
     expect(object.baz).not.to.be(baz);
-  })
+  });
+
+  test('The object itself is returned', function() {
+    var object = {};
+    expect(wrapObject(object)).to.be(object);
+  });
+
+  test('Non-functions are not wrapped', function() {
+    var object= {arbitraryKey: 'arbitraryNonFunction'};
+    wrapObject(object);
+    expect(object.arbitraryKey).to.be('arbitraryNonFunction');
+  });
+
+  test('Wrapping works on sub-objects', function() {
+    function foo() {}
+    var object = {sub: {foo: foo}};
+    wrapObject(object);
+    expect(object.sub.foo).not.to.equal(foo);
+  });
+
+  test('Don\'t rewrap seen objects', function() {
+    var object = {};
+    object.recursion = object;
+    // reaches maximum call stack when recursing infinetely
+    expect(function() { wrapObject(object); }).not.to.throwException();
+  });
 });
 
-function wrapObject(object) {
-  var names = Object.keys(object);
-  for (var i = 0, len = names.length, name; (name = names[i]) || i < len; i++) {
-    wrapMethod(object, name);
+function wrapObject(object, seenObjects) {
+  if (seenObjects) {
+    if (seenObjects.indexOf(object) !== -1) {
+      return object;
+    }
+    seenObjects.push(object);
+  } else {
+    seenObjects = [object];
   }
+
+  var names = Object.keys(object);
+  for (var i = 0, len = names.length; i < len; i++) {
+    var key = names[i], value = object[key];
+    switch(typeof value) {
+      case 'function':
+        wrapMethod(object, key);
+        break;
+      case 'object':
+        wrapObject(value, seenObjects);
+        break;
+    }
+  }
+
+  return object;
 }
