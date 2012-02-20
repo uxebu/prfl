@@ -96,6 +96,23 @@ suite('Object wrapping functionality', function() {
     // reaches maximum call stack when recursing infinetely
     expect(function() { wrapObject(object); }).not.to.throwException();
   });
+
+  test('wraps methods of functions', function() {
+    function foo() {}
+    function bar() {}
+    foo.bar = bar;
+    wrapObject({foo: foo});
+    expect(foo.bar).not.to.be(bar);
+  });
+
+  test('wraps function prototype object', function() {
+    function Foo() {}
+    function bar() {}
+    Foo.prototype.bar = bar;
+
+    wrapObject(Foo);
+    expect(Foo.prototype.bar).not.to.be(bar);
+  });
 });
 
 function wrapObject(object, seenObjects) {
@@ -108,15 +125,20 @@ function wrapObject(object, seenObjects) {
     seenObjects = [object];
   }
 
+  if (typeof object === 'function') {
+    wrapObject(object.prototype, seenObjects);
+  }
+
   var names = Object.keys(object);
   for (var i = 0, len = names.length; i < len; i++) {
     var key = names[i], value = object[key];
     switch(typeof value) {
       case 'function':
         wrapMethod(object, key);
-        break;
+        wrapObject(value.prototype, seenObjects);
+      // fallthrough intended
       case 'object':
-        wrapObject(value, seenObjects);
+        if (value !== null) wrapObject(value, seenObjects);
         break;
     }
   }
