@@ -8,7 +8,7 @@ self time for every wrapped function.
 Basic Usage
 --------------------------------------------------------------------------------
 
-~~~
+~~~js
 // create a profiler object
 var profiler = new prfl.Profiler();
 
