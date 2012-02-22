@@ -180,32 +180,94 @@ suite('Profiler', function() {
     expect(report[name].totalTime).to.be.a('number');
   });
 
-  test('Outer function total time is the sum of self time and inner function total time', function() {
+  suite('Time', function() {
     function wait(miliseconds) {
       var end = new Date().getTime() + miliseconds;
       while (new Date().getTime() < end) {}
     }
 
-    var profiler = new Profiler();
-    var object = {
-      outerFunc: function() {
-        wait(3);
-        this.innerFunc();
-      },
+    test('Outer function total time is the sum of self time and inner function total time', function() {
 
-      innerFunc: function() {
-        wait(7);
-      }
-    };
+      var profiler = new Profiler();
+      var object = {
+        outerFunc: function() {
+          wait(3);
+          this.innerFunc();
+        },
 
-    profiler.wrapObject('object', object);
-    object.outerFunc();
-    object.outerFunc();
+        innerFunc: function() {
+          wait(7);
+        }
+      };
 
-    var report = profiler.getReport();
-    var reportInner = report['object.innerFunc'];
-    var reportOuter = report['object.outerFunc'];
+      profiler.wrapObject('object', object);
+      object.outerFunc();
+      object.outerFunc();
 
-    expect(reportOuter.totalTime).to.be(reportInner.totalTime + reportOuter.selfTime);
+      var report = profiler.getReport();
+      var reportInner = report['object.innerFunc'];
+      var reportOuter = report['object.outerFunc'];
+
+      expect(reportOuter.totalTime).to.be(reportInner.totalTime + reportOuter.selfTime);
+    });
+
+    test('Outer function time is the sum of all inner functions total time and self time', function() {
+      var profiler = new Profiler();
+      var foo = profiler.wrapFunction('foo', function() { wait(2); });
+      var bar = profiler.wrapFunction('bar', function() { wait(3); });
+      var baz = profiler.wrapFunction('baz', function() { wait(5); });
+
+      var outerFunc = profiler.wrapFunction('outerFunc', function() {
+        foo();
+        bar();
+        baz();
+        wait(1);
+      });
+
+      outerFunc();
+      var report = profiler.getReport();
+      var expectedTime = report.foo.totalTime
+        + report.bar.totalTime
+        + report.baz.totalTime
+        + report.outerFunc.selfTime;
+      expect(report.outerFunc.totalTime).to.be(expectedTime);
+    });
   });
+
+  test('Samples have entries for functions that throw', function() {
+    var profiler = new Profiler();
+    var throwingFunc = sinon.stub().throws();
+    var functionName = 'throwingFunc';
+    throwingFunc = profiler.wrapFunction(functionName, throwingFunc);
+    try {
+      throwingFunc();
+    } catch (e) {}
+
+    var samples = profiler.getSamples();
+    expect(samples).to.have.key(functionName);
+    expect(samples[functionName].totalTimes).to.have.length(1);
+  });
+
+  test('Samples have entries for outer functions if inner functions throw', function() {
+    var profiler = new Profiler();
+    var innerFunction = profiler.wrapFunction('innerFunction', sinon.stub().throws());
+    var outerFunctionName = 'outerFunction';
+    var outerFunction = profiler.wrapFunction(outerFunctionName, function() { innerFunction(); });
+
+    try {
+      outerFunction();
+    } catch (e) {}
+
+    var samples = profiler.getSamples();
+    expect(samples).to.have.key(outerFunctionName);
+    expect(samples[outerFunctionName].totalTimes).to.have.length(1);
+  });
+
+  test('Expect throwing functions to throw when wrapped', function() {
+    var profiler = new Profiler();
+    var throwingFunction = profiler.wrapFunction('throwingFunction', sinon.stub().throws());
+
+    expect(throwingFunction).to.throwException();
+  });
+
 });

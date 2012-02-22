@@ -51,14 +51,27 @@
       var profiler = this;
       var getTime = this.getTime, totalTimesStack = this.totalTimesStack;
       return function() {
+        var lastIndex, returnValue, start, time;
+
+        // add level to total times stack for all nested functions
         totalTimesStack.push(0);
-        totalTimesStack.lastIndex++;
-        var start = getTime();
-        var returnValue = func.apply(this, arguments);
-        var time = getTime() - start;
-        profiler.addSample(name, time, time - totalTimesStack.pop());
-        var lastIndex = totalTimesStack.lastIndex -= 1;
-        totalTimesStack[lastIndex] += time;
+        totalTimesStack.lastIndex += 1;
+
+        // measure time and execute wrapped function
+        start = getTime();
+        try {
+          returnValue = func.apply(this, arguments);
+        } finally {
+          time = getTime() - start;
+          profiler.addSample(name, time, time - totalTimesStack.pop());
+
+          // remove level from total times stack
+          lastIndex = totalTimesStack.lastIndex -= 1;
+
+          // add time to the total times stack
+          totalTimesStack[lastIndex] += time;
+        }
+
         return returnValue;
       };
     },
