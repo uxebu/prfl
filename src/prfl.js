@@ -1,11 +1,18 @@
 (function(exports) {
   exports.Profiler = Profiler;
   exports.createObject = createObject;
+  exports.construct = construct;
 
   function createObject(base) {
     function Constructor() {}
     Constructor.prototype = base;
     return new Constructor();
+  }
+
+  function construct(constructor, args) {
+    var object = createObject(constructor.prototype);
+    constructor.apply(object, args);
+    return new constructor();
   }
 
   function Profiler() {
