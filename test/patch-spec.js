@@ -33,6 +33,44 @@ suite('Function wrapping functionality', function() {
     var wrappedFunction = new Profiler().wrapFunction('constructor', function() {});
     expect(wrappedFunction).not.to.throwException();
   });
+
+  test('A wrapped function is invoked as constructor if the wrapper is invoked as constructor', function() {
+    var spy = sinon.spy();
+    var wrappedFunction = new Profiler().wrapFunction('constructor', spy);
+    new wrappedFunction();
+
+    expect(spy.calledWithNew()).to.be.ok();
+  });
+
+  test('Arguments are passed to the wrapped function when called as constructor', function() {
+    var spy = sinon.spy();
+    var wrappedFunction = new Profiler().wrapFunction('constructor', spy);
+    var a = 'a';
+    var b = {};
+    new wrappedFunction(a, b);
+
+    expect(spy.calledWith(a, b)).to.be.ok();
+  });
+
+  test('Return values of functions returning non-objects are not returned when invoked as constructor', function() {
+    var a = 'a';
+    var mock = sinon.mock().returns(a);
+    var wrappedFunction = new Profiler().wrapFunction('constructor', mock);
+    expect(new wrappedFunction()).not.to.be(a);
+  });
+
+  test('Return values of functions returning objects are returned when invoked as constructor', function() {
+    var a = {};
+    var mock = sinon.mock().returns(a);
+    var wrappedFunction = new Profiler().wrapFunction('constructor', mock);
+    expect(new wrappedFunction()).to.be(a);
+  });
+
+  test('Return values of functions invoked as constructor, returning non-objects is an instance of the constructor', function() {
+    function Constructor() {}
+    var WrappedConstructor = new Profiler().wrapFunction('constructor', Constructor);
+    expect(new WrappedConstructor()).to.be.a(Constructor);
+  });
 });
 
 suite('Method wrapping functionality', function() {

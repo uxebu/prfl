@@ -1,4 +1,6 @@
 (function(exports) {
+  'use strict';
+
   exports.Profiler = Profiler;
   exports.createObject = createObject;
   exports.construct = construct;
@@ -66,8 +68,8 @@
     wrapFunction: function(name, func) {
       var profiler = this;
       var getTime = this.getTime, totalTimesStack = this.totalTimesStack;
-      return function() {
-        var lastIndex, returnValue, start, time;
+      return function wrapper() {
+        var constructed, lastIndex, returnValue, start, time;
 
         // add level to total times stack for all nested functions
         totalTimesStack.push(0);
@@ -76,7 +78,15 @@
         // measure time and execute wrapped function
         start = getTime();
         try {
-          returnValue = func.apply(this, arguments);
+          if (this instanceof wrapper) {
+            constructed = createObject(func.prototype);
+            returnValue = func.apply(constructed, arguments);
+            if (typeof returnValue !== 'object') {
+              returnValue = constructed;
+            }
+          } else {
+            returnValue = func.apply(this, arguments);
+          }
         } finally {
           time = getTime() - start;
           profiler.addSample(name, time, time - totalTimesStack.pop());
