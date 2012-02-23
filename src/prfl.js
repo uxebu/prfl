@@ -10,7 +10,9 @@
   Profiler.prototype = {
     addSample: function(name, totalTime, selfTime) {
       var samples = this.samples;
-      var functionSamples = (samples[name] || (samples[name] = {totalTimes: [], selfTimes: []}));
+      var functionSamples = samples.hasOwnProperty(name)
+        ? samples[name]
+        : (samples[name] = {totalTimes: [], selfTimes: []});
       functionSamples.totalTimes.push(totalTime);
       functionSamples.selfTimes.push(selfTime);
     },

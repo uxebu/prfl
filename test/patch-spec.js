@@ -28,6 +28,11 @@ suite('Function wrapping functionality', function() {
     func(1, 'foo', object);
     expect(spy.calledWith(1, 'foo', object)).to.be.ok();
   });
+
+  test('Using "constructor" as identifier should not throw an error', function() {
+    var wrappedFunction = new Profiler().wrapFunction('constructor', function() {});
+    expect(wrappedFunction).not.to.throwException();
+  });
 });
 
 suite('Method wrapping functionality', function() {
