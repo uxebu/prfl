@@ -102,13 +102,6 @@
       };
     },
 
-    wrapMethod: function(objectName, object, methodName) {
-      object[methodName] = this.wrapFunction(
-        objectName + '.' + methodName,
-        object[methodName]
-      );
-    },
-
     wrapObject: function(objectName, object, seenObjects) {
       if (object === null || object === void 0) {
         return object;
@@ -132,7 +125,7 @@
         var key = names[i], value = object[key];
         switch(typeof value) {
           case 'function':
-            this.wrapMethod(objectName, object, key);
+            object[key] = this.wrapFunction(objectName + '.' + key,object[key]);
           // fallthrough intended
           case 'object':
             if (value !== null) {

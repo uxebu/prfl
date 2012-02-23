@@ -73,25 +73,6 @@ suite('Function wrapping functionality', function() {
   });
 });
 
-suite('Method wrapping functionality', function() {
-  test('A patched method is overwritten', function() {
-    var method = function() {};
-    var object = {method: method};
-    new Profiler().wrapMethod('object', object, 'method');
-
-    expect(object.method).not.to.be(method);
-  });
-
-  test('A patched method is still invoked', function() {
-    var method = sinon.spy();
-    var object = {method: method};
-    new Profiler().wrapMethod('object', object, 'method');
-    object.method();
-
-    expect(method.called).to.be.ok();
-  });
-});
-
 suite('Object wrapping functionality', function() {
   test('All methods of an object are wrapped', function() {
     function foo() {}
