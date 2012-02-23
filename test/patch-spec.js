@@ -106,6 +106,14 @@ suite('Object wrapping functionality', function() {
     new Profiler().wrapObject('Foo', Foo);
     expect(Foo.prototype.bar).not.to.be(bar);
   });
+
+  test('does not fail when undefined is passed', function() {
+    expect(function() { new Profiler().wrapObject('undefined'); }).not.to.throwException();
+  });
+
+  false&&test('does not fail when null is passed', function() {
+    expect(function() { new Profiler().wrapObject('null', null); }).not.to.throwException();
+  });
 });
 
 suite('Profiler', function() {

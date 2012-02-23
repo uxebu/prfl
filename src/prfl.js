@@ -84,6 +84,10 @@
     },
 
     wrapObject: function(objectName, object, seenObjects) {
+      if (object === null || object === void 0) {
+        return object;
+      }
+
       if (seenObjects) {
         if (seenObjects.indexOf(object) !== -1) {
           return object;
