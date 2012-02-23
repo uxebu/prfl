@@ -1,5 +1,12 @@
 (function(exports) {
   exports.Profiler = Profiler;
+  exports.createObject = createObject;
+
+  function createObject(base) {
+    function Constructor() {}
+    Constructor.prototype = base;
+    return new Constructor();
+  }
 
   function Profiler() {
     this.samples = {};
