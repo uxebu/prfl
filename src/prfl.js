@@ -2,22 +2,7 @@
   'use strict';
 
   exports.Profiler = Profiler;
-  exports.createObject = createObject;
-  exports.construct = construct;
   exports.keys = keys;
-
-  function createObject(base) {
-    function Constructor() {}
-    Constructor.prototype = base;
-    return new Constructor();
-  }
-
-  function construct(constructor, args) {
-    var object = createObject(constructor.prototype);
-    constructor.apply(object, args);
-    return new constructor();
-  }
-
 
   function keys(object) {
     if (object === null || typeof object !== 'object') {
@@ -108,15 +93,7 @@
         // measure time and execute wrapped function
         start = getTime();
         try {
-          if (wrapper.prototype && this instanceof wrapper) {
-            constructed = createObject(func.prototype);
-            returnValue = func.apply(constructed, arguments);
-            if (typeof returnValue !== 'object') {
-              returnValue = constructed;
-            }
-          } else {
-            returnValue = func.apply(this, arguments);
-          }
+          returnValue = func.apply(this, arguments);
         } finally {
           time = getTime() - start;
           profiler.addSample(name, time, time - totalTimesStack.pop());
