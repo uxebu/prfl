@@ -74,7 +74,7 @@ suite('Function wrapping functionality', function() {
     expect(new wrappedFunction()).to.be(a);
   });
 
-  test('Return values of functions invoked as constructor, returning non-objects is an instance of the constructor', function() {
+  test('Return value of functions invoked as constructor, returning non-objects is an instance of the original function', function() {
     function Constructor() {}
     var WrappedConstructor = new Profiler().wrapFunction('constructor', Constructor);
     expect(new WrappedConstructor()).to.be.a(Constructor);
