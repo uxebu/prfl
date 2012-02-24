@@ -89,7 +89,7 @@
 
       var profiler = this;
       var getTime = this.getTime, totalTimesStack = this.totalTimesStack;
-      return function wrapper() {
+      var wrapper = function wrapper() {
         var constructed, lastIndex, returnValue, start, time;
 
         // add level to total times stack for all nested functions
@@ -121,6 +121,16 @@
 
         return returnValue;
       };
+
+      this.wrapObject(name, func);
+
+      for (var key in func) {
+        if (func.hasOwnProperty(key)) {
+          wrapper[key] = func[key];
+        }
+      }
+
+      return wrapper;
     },
 
     keys: Object.keys || keys,

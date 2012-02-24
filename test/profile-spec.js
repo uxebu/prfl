@@ -75,6 +75,20 @@ suite('Function wrapping functionality', function() {
     var WrappedConstructor = new Profiler().wrapFunction('constructor', Constructor);
     expect(new WrappedConstructor()).to.be.a(Constructor);
   });
+
+  test('Function wrappers expose properties of the wrapped function', function() {
+    function testedFunction() {}
+    testedFunction.nonFunctionProperty = {};
+
+    var functionProperty = sinon.spy();
+    testedFunction.functionProperty = functionProperty;
+
+    var wrappedFunction = new Profiler().wrapFunction('testedFunction', testedFunction);
+    expect(wrappedFunction.nonFunctionProperty).to.be(testedFunction.nonFunctionProperty);
+
+    wrappedFunction.functionProperty();
+    expect(functionProperty.called).to.be.ok();
+  });
 });
 
 suite('Object wrapping functionality', function() {
