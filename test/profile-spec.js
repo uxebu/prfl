@@ -93,6 +93,27 @@ suite('Function wrapping functionality', function() {
     });
   }
 
+  test('Calling a parent constructor in the context of a "subclass" instance works as expected', function() {
+    var profiler = new Profiler();
+    var propertyName = 'arbitraryProperty', propertyValue = 'arbitrary Value;'
+
+    var ParentConstructor = profiler.wrapFunction('ParentConstructor', function() {
+      this[propertyName] = propertyValue;
+    });
+
+    var ChildConstructor = function() {
+      ParentConstructor.call(this);
+    };
+    ChildConstructor.prototype = new ParentConstructor;
+
+    var WrappedChildConstructor = profiler.wrapFunction('ChildConstructor', ChildConstructor);
+
+    var instance = new WrappedChildConstructor();
+    expect(instance).to.be.a(ParentConstructor);
+    expect(instance).to.have.key(propertyName);
+    expect(instance[propertyName]).to.be(propertyValue);
+  });
+
   test('Function wrappers expose properties of the wrapped function', function() {
     function testedFunction() {}
     testedFunction.nonFunctionProperty = {};
