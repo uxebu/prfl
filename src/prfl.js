@@ -83,6 +83,10 @@
     },
 
     wrapFunction: function(name, func) {
+      if (typeof name !== 'string') {
+        throw TypeError('Expected string as first argument, but received a ' + typeof name);
+      }
+
       var profiler = this;
       var getTime = this.getTime, totalTimesStack = this.totalTimesStack;
       return function wrapper() {

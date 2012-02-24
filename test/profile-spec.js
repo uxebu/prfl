@@ -3,6 +3,10 @@ var sinon = require('sinon');
 var Profiler = require('../src/prfl').Profiler;
 
 suite('Function wrapping functionality', function() {
+  test('If the first parameter to `wrapFunction` is not a string, an error is thrown', function() {
+    expect(function() {new Profiler().wrapFunction(function() {})}).to.throwException();
+  });
+
   test('The return value of a wrapped function is passed through', function() {
     var func = new Profiler().wrapFunction('no name', function() {
       return 1;
