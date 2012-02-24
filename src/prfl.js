@@ -35,6 +35,7 @@
   }
 
   function Profiler() {
+    this.seenObjects = [];
     this.samples = {};
     this.totalTimesStack = [0];
     this.totalTimesStack.lastIndex = 0;
@@ -91,6 +92,10 @@
         throw TypeError('Expected function as second argument, but received a ' + typeof name);
       }
 
+      if (this.seenObjects.indexOf(func) !== -1) {
+        return func;
+      }
+
       var profiler = this;
       var getTime = this.getTime, totalTimesStack = this.totalTimesStack;
       var wrapper = function wrapper() {
@@ -139,19 +144,16 @@
 
     keys: Object.keys || keys,
 
-    wrapObject: function(objectName, object, seenObjects) {
+    wrapObject: function(objectName, object) {
       if (object === null || object === void 0) {
         return object;
       }
 
-      if (seenObjects) {
-        if (seenObjects.indexOf(object) !== -1) {
-          return object;
-        }
-        seenObjects.push(object);
-      } else {
-        seenObjects = [object];
+      var seenObjects = this.seenObjects;
+      if (seenObjects.indexOf(object) !== -1) {
+        return object;
       }
+      seenObjects.push(object);
 
       if (typeof object === 'function') {
         this.wrapObject(objectName + '.prototype', object.prototype, seenObjects);

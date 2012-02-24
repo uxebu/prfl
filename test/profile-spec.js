@@ -93,6 +93,16 @@ suite('Function wrapping functionality', function() {
     wrappedFunction.functionProperty();
     expect(functionProperty.called).to.be.ok();
   });
+
+  test('Cyclic reference properties between a wrapped function and an object should not cause rewrapping of seen objects', function() {
+    function func() {}
+    var object = func.object = {func: func};
+
+    // reaches maximum call stack when recursing infinetely
+    expect(function() {
+      new Profiler().wrapFunction('function', func);
+    }).not.to.throwException();
+  });
 });
 
 suite('Object wrapping functionality', function() {
