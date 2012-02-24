@@ -180,7 +180,7 @@ suite('Object wrapping functionality', function() {
     expect(function() { new Profiler().wrapObject('undefined'); }).not.to.throwException();
   });
 
-  false&&test('does not fail when null is passed', function() {
+  test('does not fail when null is passed', function() {
     expect(function() { new Profiler().wrapObject('null', null); }).not.to.throwException();
   });
 });
