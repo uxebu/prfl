@@ -7,6 +7,10 @@ suite('Function wrapping functionality', function() {
     expect(function() {new Profiler().wrapFunction(function() {})}).to.throwException();
   });
 
+  test('If the second parameter to `wrapFunction` is not a function, an error is thrown', function() {
+    expect(function() {new Profiler().wrapFunction('a string')}).to.throwException();
+  });
+
   test('The return value of a wrapped function is passed through', function() {
     var func = new Profiler().wrapFunction('no name', function() {
       return 1;

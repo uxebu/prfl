@@ -87,6 +87,10 @@
         throw TypeError('Expected string as first argument, but received a ' + typeof name);
       }
 
+      if (typeof func !== 'function') {
+        throw TypeError('Expected function as second argument, but received a ' + typeof name);
+      }
+
       var profiler = this;
       var getTime = this.getTime, totalTimesStack = this.totalTimesStack;
       var wrapper = function wrapper() {
