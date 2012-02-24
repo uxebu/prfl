@@ -119,6 +119,8 @@
       };
     },
 
+    keys: Object.keys || keys,
+
     wrapObject: function(objectName, object, seenObjects) {
       if (object === null || object === void 0) {
         return object;
@@ -137,7 +139,7 @@
         this.wrapObject(objectName + '.prototype', object.prototype, seenObjects);
       }
 
-      var names = Object.keys(object);
+      var names = this.keys(object);
       for (var i = 0, len = names.length; i < len; i++) {
         var key = names[i], value = object[key];
         switch(typeof value) {
