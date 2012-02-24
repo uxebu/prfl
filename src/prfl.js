@@ -133,6 +133,7 @@
 
       this.wrapObject(name, func);
 
+      wrapper.prototype = func.prototype;
       for (var key in func) {
         if (func.hasOwnProperty(key)) {
           wrapper[key] = func[key];

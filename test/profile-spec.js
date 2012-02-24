@@ -80,6 +80,12 @@ suite('Function wrapping functionality', function() {
     expect(new WrappedConstructor()).to.be.a(Constructor);
   });
 
+  test('Return value of functions invoked as constructor, returning non-objects is an instance of the wrapper function', function() {
+    function Constructor() {}
+    var WrappedConstructor = new Profiler().wrapFunction('constructor', Constructor);
+    expect(new WrappedConstructor()).to.be.a(WrappedConstructor);
+  });
+
   test('Function wrappers expose properties of the wrapped function', function() {
     function testedFunction() {}
     testedFunction.nonFunctionProperty = {};
