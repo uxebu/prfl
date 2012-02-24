@@ -1,6 +1,6 @@
 var expect = require('expect.js');
+var keys = require('../src/prfl').keys;
 
-//var keys = require('../src/prfl').keys;
 suite('keys()', function() {
   var checkException = function(e) {
     expect(e).to.be.a(TypeError);
@@ -61,17 +61,3 @@ suite('keys()', function() {
 
 });
 
-function keys(object) {
-  if (object === null || typeof object !== 'object') {
-    throw TypeError('keys called on non-object');
-  }
-
-  var keys = [];
-  for (var key in object) {
-    if (object.hasOwnProperty(key)) {
-      keys.push(key);
-    }
-  }
-
-  return keys;
-}

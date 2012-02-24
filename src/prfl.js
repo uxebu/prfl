@@ -4,6 +4,7 @@
   exports.Profiler = Profiler;
   exports.createObject = createObject;
   exports.construct = construct;
+  exports.keys = keys;
 
   function createObject(base) {
     function Constructor() {}
@@ -15,6 +16,22 @@
     var object = createObject(constructor.prototype);
     constructor.apply(object, args);
     return new constructor();
+  }
+
+
+  function keys(object) {
+    if (object === null || typeof object !== 'object') {
+      throw TypeError('keys called on non-object');
+    }
+
+    var keys = [];
+    for (var key in object) {
+      if (object.hasOwnProperty(key)) {
+        keys.push(key);
+      }
+    }
+
+    return keys;
   }
 
   function Profiler() {
