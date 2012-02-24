@@ -86,6 +86,13 @@ suite('Function wrapping functionality', function() {
     expect(new WrappedConstructor()).to.be.a(WrappedConstructor);
   });
 
+  // only applicable for ES5
+  if (/\{ \[native code\] \}$/.test(Array.isArray)) {
+    test('ES5: Wrappers of functions without prototype should not throw exceptions', function() {
+      expect(new Profiler().wrapFunction('isArray', Array.isArray)).not.to.throwException();
+    });
+  }
+
   test('Function wrappers expose properties of the wrapped function', function() {
     function testedFunction() {}
     testedFunction.nonFunctionProperty = {};

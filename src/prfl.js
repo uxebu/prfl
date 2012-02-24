@@ -108,7 +108,7 @@
         // measure time and execute wrapped function
         start = getTime();
         try {
-          if (this instanceof wrapper) {
+          if (wrapper.prototype && this instanceof wrapper) {
             constructed = createObject(func.prototype);
             returnValue = func.apply(constructed, arguments);
             if (typeof returnValue !== 'object') {
