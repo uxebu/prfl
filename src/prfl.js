@@ -36,16 +36,26 @@
       functionSamples.selfTimes.push(selfTime);
     },
 
+    createReportFromSamples: function(samples) {
+      var numCalls = samples.length;
+      var sum = this.sum(samples);
+      return {
+        average: sum / numCalls,
+        max: Math.max.apply(Math, samples),
+        min: Math.min.apply(Math, samples),
+        sum: sum
+      }
+    },
+
     getReport: function() {
       var report = {}, samples = this.getSamples();
-      var sum = this.sum;
       for (var name in samples) {
         if (samples.hasOwnProperty(name)) {
           var functionSamples = samples[name];
           report[name] = {
-            calls: functionSamples.totalTimes.length,
-            selfTime: sum(functionSamples.selfTimes),
-            totalTime: sum(functionSamples.totalTimes)
+            numCalls: functionSamples.totalTimes.length,
+            selfTime: this.createReportFromSamples(functionSamples.selfTimes),
+            totalTime: this.createReportFromSamples(functionSamples.totalTimes)
           };
         }
       }

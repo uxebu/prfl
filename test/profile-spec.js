@@ -270,12 +270,20 @@ suite('Profiler', function() {
     var report = profiler.getReport();
     expect(report).to.be.an('object');
     expect(report).to.only.have.key(name);
-    expect(report[name]).to.have.key('calls');
-    expect(report[name]).to.have.key('selfTime');
-    expect(report[name]).to.have.key('totalTime');
-    expect(report[name].calls).to.be(2);
-    expect(report[name].selfTime).to.be.a('number');
-    expect(report[name].totalTime).to.be.a('number');
+
+    var functionReport = report[name];
+    expect(functionReport).to.have.keys('numCalls', 'selfTime', 'totalTime');
+    expect(functionReport.numCalls).to.be(2);
+    expect(functionReport.selfTime).to.have.keys('average', 'max', 'min', 'sum');
+    expect(functionReport.selfTime.average).to.be.a('number');
+    expect(functionReport.selfTime.max).to.be.a('number');
+    expect(functionReport.selfTime.min).to.be.a('number');
+    expect(functionReport.selfTime.sum).to.be.a('number');
+    expect(functionReport.totalTime).to.have.keys('average', 'max', 'min', 'sum');
+    expect(functionReport.totalTime.average).to.be.a('number');
+    expect(functionReport.totalTime.max).to.be.a('number');
+    expect(functionReport.totalTime.min).to.be.a('number');
+    expect(functionReport.totalTime.sum).to.be.a('number');
   });
 
   suite('Time', function() {
@@ -306,7 +314,7 @@ suite('Profiler', function() {
       var reportInner = report['object.innerFunc'];
       var reportOuter = report['object.outerFunc'];
 
-      expect(reportOuter.totalTime).to.be(reportInner.totalTime + reportOuter.selfTime);
+      expect(reportOuter.totalTime.sum).to.be(reportInner.totalTime.sum + reportOuter.selfTime.sum);
     });
 
     test('Outer function time is the sum of all inner functions total time and self time', function() {
@@ -324,11 +332,11 @@ suite('Profiler', function() {
 
       outerFunc();
       var report = profiler.getReport();
-      var expectedTime = report.foo.totalTime
-        + report.bar.totalTime
-        + report.baz.totalTime
-        + report.outerFunc.selfTime;
-      expect(report.outerFunc.totalTime).to.be(expectedTime);
+      var expectedTime = report.foo.totalTime.sum
+        + report.bar.totalTime.sum
+        + report.baz.totalTime.sum
+        + report.outerFunc.selfTime.sum;
+      expect(report.outerFunc.totalTime.sum).to.be(expectedTime);
     });
   });
 
