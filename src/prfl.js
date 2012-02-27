@@ -103,7 +103,7 @@
       var profiler = this;
       var getTime = this.getTime, totalTimesStack = this.totalTimesStack;
       var wrapper = function wrapper() {
-        var constructed, lastIndex, returnValue, start, time;
+        var lastIndex, returnValue, start, time;
 
         // add level to total times stack for all nested functions
         totalTimesStack.push(0);
