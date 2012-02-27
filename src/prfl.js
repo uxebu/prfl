@@ -36,17 +36,6 @@
       functionSamples.selfTimes.push(selfTime);
     },
 
-    createReportFromSamples: function(samples) {
-      var numCalls = samples.length;
-      var sum = this.sum(samples);
-      return {
-        average: sum / numCalls,
-        max: Math.max.apply(Math, samples),
-        min: Math.min.apply(Math, samples),
-        sum: sum
-      }
-    },
-
     getReport: function() {
       var report = {}, samples = this.getSamples();
       for (var name in samples) {
@@ -54,8 +43,8 @@
           var functionSamples = samples[name];
           report[name] = {
             numCalls: functionSamples.totalTimes.length,
-            selfTime: this.createReportFromSamples(functionSamples.selfTimes),
-            totalTime: this.createReportFromSamples(functionSamples.totalTimes)
+            selfTime: this.statistics(functionSamples.selfTimes),
+            totalTime: this.statistics(functionSamples.totalTimes)
           };
         }
       }
@@ -69,13 +58,27 @@
 
     getTime: Date.now || function() { return new Date().getTime(); },
 
-    sum: function(iterable) {
-      var i = 0, len = iterable.length, sum = 0;
-      while (i < len) {
-        sum += iterable[i++];
+    statistics: function(samples) {
+      var max = samples[0], min = max, sum = max;
+      var numCalls = samples.length;
+      for (var i = 1; i < numCalls; i++) {
+        var sample = samples[i];
+        sum += sample;
+        if (sample > max) {
+          max = sample;
+        }
+        else if (sample < min) {
+          min = sample;
+        }
       }
 
-      return sum;
+      return {
+        average: sum / numCalls,
+        numCalls: numCalls,
+        max: max,
+        min: min,
+        sum: sum
+      }
     },
 
     wrapFunction: function(name, func) {
