@@ -287,23 +287,36 @@ suite('Profiler', function() {
   });
 
   suite('Time', function() {
-    function wait(miliseconds) {
-      var end = new Date().getTime() + miliseconds;
-      while (new Date().getTime() < end) {}
+    function mockTime(time) {
+      var i = 0, numValues = arguments.length, values = arguments;
+      return function() {
+        if (i >= numValues) {
+          throw RangeError('mockTime: no time entries left');
+        }
+        return values[i++];
+      }
     }
 
     test('Outer function total time is the sum of self time and inner function total time', function() {
 
       var profiler = new Profiler();
+      profiler.getTime = mockTime(
+        // two times are needed for each function per call
+        11000, // start outer
+        12000, // start inner
+        13000, // end inner
+        13000, // end outer
+        14000,
+        14005,
+        14005,
+        15000
+      );
       var object = {
         outerFunc: function() {
-          wait(3);
           this.innerFunc();
         },
 
-        innerFunc: function() {
-          wait(7);
-        }
+        innerFunc: function() {}
       };
 
       profiler.wrapObject('object', object);
@@ -319,15 +332,16 @@ suite('Profiler', function() {
 
     test('Outer function time is the sum of all inner functions total time and self time', function() {
       var profiler = new Profiler();
-      var foo = profiler.wrapFunction('foo', function() { wait(2); });
-      var bar = profiler.wrapFunction('bar', function() { wait(3); });
-      var baz = profiler.wrapFunction('baz', function() { wait(5); });
+      profiler.getTime = mockTime(1, 2, 4, 8, 9, 12, 15, 17);
+
+      var foo = profiler.wrapFunction('foo', function() {});
+      var bar = profiler.wrapFunction('bar', function() {});
+      var baz = profiler.wrapFunction('baz', function() {});
 
       var outerFunc = profiler.wrapFunction('outerFunc', function() {
         foo();
         bar();
         baz();
-        wait(1);
       });
 
       outerFunc();
