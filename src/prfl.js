@@ -73,12 +73,14 @@
       }
 
       var median, sorted = samples.slice().sort(function(a, b) { return a - b; });
-      median = numCalls % 0 ?
-        sorted[(numCalls - 1) / 2] :
-        (sorted[numCalls / 2] + sorted[numCalls / 2 - 1]) / 2;
+      if (numCalls > 0) {
+        median = numCalls % 2 ?
+          sorted[(numCalls - 1) / 2] :
+          (sorted[numCalls / 2] + sorted[numCalls / 2 - 1]) / 2;
+      }
 
       return {
-        average: sum / numCalls,
+        average: numCalls ? sum / numCalls : void 0,
         numCalls: numCalls,
         max: max,
         median: median,

@@ -391,3 +391,92 @@ suite('Profiler', function() {
   });
 
 });
+
+suite('Statistics', function() {
+  var profiler = new Profiler();
+
+  test('`numCalls` is equal to the number of samples for 0 samples', function() {
+    var samples = [];
+    expect(profiler.statistics(samples).numCalls).to.be(samples.length);
+  });
+
+
+  test('`numCalls` is equal to the number of samples for a low number of samples', function() {
+    var samples = [5, 13, 2, 9];
+    expect(profiler.statistics(samples).numCalls).to.be(samples.length);
+  });
+
+
+  test('`numCalls` is equal to the number of samples for a high number of samples', function() {
+    var samples = [14, 9, 4, 18, 4, 9, 18, 8, 13, 0, 17, 15, 8, 7, 15, 11, 18,
+      17, 6, 13, 11, 9, 19, 17, 9, 14, 5, 19, 20, 16, 20, 14, 19, 5, 5, 20, 2,
+      12, 4, 11, 19, 0, 5, 9, 16, 15, 17, 18, 6, 6, 1, 1, 18, 5, 18, 16, 15, 7,
+      6, 7, 8, 16, 6, 19, 11, 5, 17, 20, 19, 9, 16, 12, 12, 4, 13, 1, 19, 19,
+      16, 9, 14, 10, 0, 17, 18, 0, 6, 10, 4, 10, 9, 4, 4, 10, 2, 16, 15, 10, 9,
+      11, 3, 20, 14, 18, 8, 3, 16, 1, 11, 7, 7, 17, 14, 12, 4, 15, 12, 16, 3, 6,
+      15, 2, 1, 14, 8, 13, 20, 2, 4, 5, 20, 3, 2, 1, 14, 16, 2, 9, 6, 16, 3, 13,
+      13, 1, 0, 10, 16, 8, 3, 16, 4, 7, 3, 7, 4, 18, 13, 6, 3, 3, 13, 2, 4, 20,
+      7, 9, 15, 13, 15, 12, 12, 13, 0, 15, 6, 2, 18, 5, 17, 8, 13, 13, 19, 18,
+      7, 16, 20, 10, 15, 9, 0, 5, 11, 20, 19, 17, 3, 0, 19, 1, 18, 6, 14, 3, 17,
+      0, 0, 5, 8, 13, 9, 16, 14, 3, 10, 1, 3, 10, 6, 8, 5, 20, 14, 17, 13, 1,
+      15, 10, 6, 17, 6, 10, 11, 4, 14, 13, 0, 3, 5, 1, 15, 0, 9, 15, 1, 5, 6,
+      10, 2, 2, 2, 8, 10, 15, 15, 6, 7, 18, 20, 2, 3, 1, 14, 13, 13, 17, 4, 10,
+      6, 1, 3, 0, 16, 4, 19, 13, 9, 14, 4, 7, 0, 16, 11, 2, 16, 3, 18, 16, 19,
+      5, 20, 17, 16, 13, 5, 6, 7, 5, 2, 8, 11, 7, 9, 11, 10, 11, 11, 12, 3, 19,
+      6, 13, 17, 18, 12, 15, 19, 11, 15, 13, 18, 0, 15, 16, 1, 1, 7, 16, 6, 9,
+      6, 19, 15, 5, 1, 12, 1, 20, 15, 8, 4, 7, 7, 20, 9, 8, 13, 17, 19, 13, 2,
+      10, 9, 7, 4, 5, 20, 10, 18, 17, 5, 9, 8, 11, 9, 18, 14, 8, 1, 14, 5, 0,
+      20, 17, 3, 7, 8, 19, 19, 0, 10, 12, 12, 8, 19, 3, 1, 16, 19, 0, 6, 8, 14,
+      13, 11, 8, 13, 0, 3, 12, 20, 4, 2, 2, 4, 12, 1, 20, 7, 18, 17, 13, 18, 19,
+      9, 7, 18, 5, 8, 6, 19, 7, 8, 12, 14, 13, 8, 0, 16, 10, 16, 5, 6, 4, 15, 8,
+      5, 14, 19, 19, 2, 8, 17, 8, 8, 14, 9, 7, 17, 11, 8, 19, 8, 5, 11, 18, 1,
+      9, 12, 14, 0, 16, 1, 15, 12, 1, 10, 19, 17, 4, 4, 8, 4, 10, 8, 20, 20, 15,
+      5, 0, 5, 15, 2, 20, 19, 4, 12, 2, 12, 9, 19, 11, 2, 12, 17, 1, 15, 1, 18,
+      0, 10, 12, 19, 10, 2, 14, 7, 2, 20, 3, 0, 3, 15, 0, 2, 11, 7, 1];
+    expect(profiler.statistics(samples).numCalls).to.be(samples.length);
+  });
+
+  test('`average` holds the average of all samples', function() {
+    expect(profiler.statistics([3, 5, 2, 1, 0, 2, 2, 5]).average).to.be(2.5);
+  });
+
+  test('`average` for an empty sample set is undefined', function() {
+    expect(profiler.statistics([]).average).to.be(void 0);
+  });
+
+  test('`max` holds the maximum value', function() {
+    expect(profiler.statistics([0, 9, -2, 14, 1, 0]).max).to.be(14);
+  });
+
+  test('`max` for an empty sample set is undefined', function() {
+    expect(profiler.statistics([]).max).to.be(void 0);
+  });
+
+  test('`min` holds the minimum value', function() {
+    expect(profiler.statistics([0, 9, -2, 14, 1, 0]).min).to.be(-2);
+  });
+
+  test('`min` for an empty sample set is undefined', function() {
+    expect(profiler.statistics([]).min).to.be(void 0);
+  });
+
+  test('`median` is computed correctly for sets with odd length', function() {
+    expect(profiler.statistics([2, 0, 1, 5, 4]).median).to.be(2);
+  });
+
+  test('`median` is computed correctly for sets with even length', function() {
+    expect(profiler.statistics([2, 0, 1, 5, 4, 3]).median).to.be(2.5);
+  });
+
+  test('`median` of an empty sample set is undefined', function() {
+    expect(profiler.statistics([]).median).to.be(void 0);
+  });
+
+  test('`sum` is equal to the sum of all samples', function() {
+    expect(profiler.statistics([4, 2, 5]).sum).to.be(11);
+  });
+
+  test('`sum` of an empty sample set is undefined', function() {
+    expect(profiler.statistics([]).sum).to.be(void 9);
+  });
+});
