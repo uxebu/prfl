@@ -274,13 +274,13 @@ suite('Profiler', function() {
     var functionReport = report[name];
     expect(functionReport).to.have.keys('numCalls', 'selfTime', 'totalTime');
     expect(functionReport.numCalls).to.be(2);
-    expect(functionReport.selfTime).to.have.keys('average', 'max', 'min', 'sum');
-    expect(functionReport.selfTime.average).to.be.a('number');
+    expect(functionReport.selfTime).to.have.keys('mean', 'max', 'min', 'sum');
+    expect(functionReport.selfTime.mean).to.be.a('number');
     expect(functionReport.selfTime.max).to.be.a('number');
     expect(functionReport.selfTime.min).to.be.a('number');
     expect(functionReport.selfTime.sum).to.be.a('number');
-    expect(functionReport.totalTime).to.have.keys('average', 'max', 'min', 'sum');
-    expect(functionReport.totalTime.average).to.be.a('number');
+    expect(functionReport.totalTime).to.have.keys('mean', 'max', 'min', 'sum');
+    expect(functionReport.totalTime.mean).to.be.a('number');
     expect(functionReport.totalTime.max).to.be.a('number');
     expect(functionReport.totalTime.min).to.be.a('number');
     expect(functionReport.totalTime.sum).to.be.a('number');
@@ -436,12 +436,12 @@ suite('Statistics', function() {
     expect(profiler.statistics(samples).numCalls).to.be(samples.length);
   });
 
-  test('`average` holds the average of all samples', function() {
-    expect(profiler.statistics([3, 5, 2, 1, 0, 2, 2, 5]).average).to.be(2.5);
+  test('`mean` holds the average of all samples', function() {
+    expect(profiler.statistics([3, 5, 2, 1, 0, 2, 2, 5]).mean).to.be(2.5);
   });
 
-  test('`average` for an empty sample set is undefined', function() {
-    expect(profiler.statistics([]).average).to.be(void 0);
+  test('`mean` for an empty sample set is undefined', function() {
+    expect(profiler.statistics([]).mean).to.be(void 0);
   });
 
   test('`max` holds the maximum value', function() {

@@ -80,9 +80,9 @@
       }
 
       return {
-        average: numCalls ? sum / numCalls : void 0,
         numCalls: numCalls,
         max: max,
+        mean: numCalls ? sum / numCalls : void 0,
         median: median,
         min: min,
         sum: sum
